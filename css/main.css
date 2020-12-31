@@ -1,0 +1,25 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    height: 100vh;
+    background-color: #77b372;
+}
+
+
+div {
+    position: relative;
+}
+
+div::after {
+    content: '';
+    position: absolute;
+    display: block;
+    left: -5%;
+    top: -5%;
+    width: 110%;
+    height: 110%;
+    z-index: -1;
+    background: #9c523d;
+}
