@@ -66,7 +66,7 @@ const calculateElephant = calculate((x, y) => {
             pushMove(i);
         }
     }
-    calc(-1, i => i > 0);
+    calc(-1, i => i >= 0);
     term = 1;
     calc(1, i => i < 8);
     return calculatedMoves;
