@@ -7,9 +7,11 @@ class Figure {
 		this._side = side;
 		this._position = position;
 		this.calculateMove = calculateMoveMethod;
+		this.moveCounter = 0;
 	}
 
 	set position(position) {
+		this.moveCounter++;
 		this._position = position;
 	} 
 

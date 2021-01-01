@@ -1,14 +1,16 @@
+import MoveCalculator from './util/MoveCalculator.js';
+
 function Figure(name, method) {
 	this.name = name;
 	this.calculateMoveMethod = method;
 }
 
-const PAWN = new Figure('pawn', () => {});
-const ROOK = new Figure('rook', () => {});
-const KNIGHT = new Figure('knight', () => {});;
-const ELEPHANT = new Figure('elephant', () => {});
-const QUEEN = new Figure('queen', () => {});
-const KING = new Figure('king', () => {});
+const PAWN = new Figure('pawn', MoveCalculator.calculatePawn);
+const ROOK = new Figure('rook', MoveCalculator.calculateRook);
+const KNIGHT = new Figure('knight', MoveCalculator.calculateKnight);
+const ELEPHANT = new Figure('elephant', MoveCalculator.calculateElephant);
+const QUEEN = new Figure('queen', MoveCalculator.calculateQueen);
+const KING = new Figure('king', MoveCalculator.calculateKing);
 
 const BLACK = 'black';
 const WHITE = 'white'; 
@@ -30,6 +32,7 @@ const BEGIN_POSITION_Y_BLACK = 6;
 
 const BLACK_COLOR = '#6e6e6e';
 const WHITE_COLOR = '#e8e8e8';
+const CALC_MOVE_COLOR = 'rgba(246, 255, 122, 0.6)';
 
 
 function ImagePosition(x) {
@@ -54,5 +57,6 @@ export {
 	BEGIN_POSITION_Y_WHITE,
 	BLACK_COLOR,
 	WHITE_COLOR,
+	CALC_MOVE_COLOR,
 	IMAGE,
 };

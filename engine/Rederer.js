@@ -1,4 +1,4 @@
-import { BLACK_COLOR, WHITE_COLOR, IMAGE} from './config.js';
+import { BLACK_COLOR, WHITE_COLOR, IMAGE, CALC_MOVE_COLOR} from './config.js';
 
 class Renderer {
     constructor(w, h, board) {
@@ -47,13 +47,15 @@ class Renderer {
                 return figureB;
             }
         }
-        return {};
+        return null;
     }
 
     handleClick(e) {
         const coords = this.getCoordsByClick(e);
         const figure = this.findFigureByCoords(coords);
-        console.log(figure);
+        if (figure) {
+            this.drawMoves(figure);
+        }
     }
 
     drawBoard() {
@@ -91,8 +93,18 @@ class Renderer {
         }
     }
 
-    drawMoves() {
-
+    drawMoves(figure) {
+        this.ctx.clearRect(0, 0, this.w, this.h);
+        this.drawBoard();
+        const calculatedMoves = figure.calculateMove();
+        for (let i = 0; i < calculatedMoves.length; i++) {
+            const move = calculatedMoves[i];
+            const x = move.x * this.cellSize;
+            const y = move.y * this.cellSize;
+            this.ctx.fillStyle = CALC_MOVE_COLOR;
+            this.ctx.fillRect(x, y, this.cellSize, this.cellSize);
+        }
+        this.drawFigures();
     }
 }
 
