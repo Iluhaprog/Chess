@@ -10,6 +10,7 @@ class Renderer {
         this.h = h;
         this.cellSize = this.w / 8;
         this.board = board;
+        this.selectedFigure = null;
     }
 
     getCoordsByClick(event) {
@@ -50,12 +51,34 @@ class Renderer {
         return null;
     }
 
+    findMoveByCoords(coords) {
+        const moves = this.selectedFigure.calculateMove();
+        for (let i = 0; i < moves.length; i++) {
+            const moveIsMatch = this.match(moves[i], coords);
+            if (moveIsMatch) return moves[i]; 
+        }
+        return null;
+    }
+
     handleClick(e) {
         const coords = this.getCoordsByClick(e);
         const figure = this.findFigureByCoords(coords);
         if (figure) {
             this.drawMoves(figure);
+            this.selectedFigure = figure;
         }
+        if(this.selectedFigure) {
+            const selectedMove = this.findMoveByCoords(coords);
+            if (selectedMove) {
+                this.moveFigure(selectedMove);
+            }
+        }
+    }
+
+    moveFigure(move) {
+        this.selectedFigure.position = move;
+        this.drawBoard();
+        this.drawFigures();
     }
 
     drawBoard() {
