@@ -69,16 +69,37 @@ class Renderer {
     handleClick(e) {
         const coords = this.getCoordsByClick(e);
         const figure = this.findFigureByCoords(coords);
+        let isKill = false;
         if(this.selectedFigure) {
+            const killMove = this.findKillCellByCoords(coords);
             const selectedMove = this.findMoveByCoords(coords);
+            if (killMove) {
+                this.kill(killMove);
+                isKill = true;
+            }
             if (selectedMove) {
                 this.moveFigure(selectedMove);
             }
+            this.selectedFigure = null;
         }
         if (figure) {
             this.selectedFigure = figure;
-            this.drawMoves(figure);
+            !isKill && this.drawMoves(figure);
         }
+    }
+
+    kill(killMove) {
+        const arr = this.allFigures;
+        let killedFigure = {};
+        for (const el of arr) {
+            if (el.position.x === killMove.x && el.position.y === killMove.y) {
+                killedFigure = el;
+                break;
+            }
+        }
+        this.allFigures = this.allFigures.filter(f => f.id !== killedFigure.id);
+        this.drawBoard();
+        this.drawFigures();
     }
 
     moveFigure(move) {

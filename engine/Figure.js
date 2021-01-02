@@ -34,6 +34,10 @@ class Figure {
 	get side() {
 		return this._side;
 	}
+
+	get id() {
+		return this._id;
+	}
 }
 
 export default Figure;
