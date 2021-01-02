@@ -1,4 +1,4 @@
-import { BLACK_COLOR, WHITE_COLOR, IMAGE, CALC_MOVE_COLOR} from './config.js';
+import { BLACK_COLOR, WHITE_COLOR, IMAGE, CALC_MOVE_COLOR, KILL_MOVE_COLOR} from './config.js';
 
 class Renderer {
     constructor(w, h, board) {
@@ -125,7 +125,7 @@ class Renderer {
             const move = calculatedMoves[i];
             const x = move.x * this.cellSize;
             const y = move.y * this.cellSize;
-            this.ctx.fillStyle = CALC_MOVE_COLOR;
+            this.ctx.fillStyle = move.isKill ? KILL_MOVE_COLOR : CALC_MOVE_COLOR;
             this.ctx.fillRect(x, y, this.cellSize, this.cellSize);
         }
         this.drawFigures();

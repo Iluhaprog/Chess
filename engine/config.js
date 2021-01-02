@@ -33,6 +33,7 @@ const BEGIN_POSITION_Y_BLACK = 6;
 const BLACK_COLOR = '#6e6e6e';
 const WHITE_COLOR = '#e8e8e8';
 const CALC_MOVE_COLOR = 'rgba(246, 255, 122, 0.6)';
+const KILL_MOVE_COLOR = 'rgba(235, 86, 75, 0.6)'
 
 
 function ImagePosition(x) {
@@ -58,5 +59,6 @@ export {
 	BLACK_COLOR,
 	WHITE_COLOR,
 	CALC_MOVE_COLOR,
+	KILL_MOVE_COLOR,
 	IMAGE,
 };

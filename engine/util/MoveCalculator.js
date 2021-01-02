@@ -16,8 +16,12 @@ function normalizeMoves(moves, side, figures) {
     for (let i = 0; i < moves.length; i++) {
         let isSelf = false;
         const move = moves[i];
+        move.isKill = false;
         for (let j = 0; j < figures.length; j++) {
             const { x, y } = figures[j].position;
+            if (x === move.x && y === move.y && figures[j].side) {
+                move.isKill = true;
+            }
             if (x === move.x && y === move.y && figures[j].side === side) {
                 isSelf = true;
                 break;
@@ -25,6 +29,7 @@ function normalizeMoves(moves, side, figures) {
         }
         !isSelf && result.push(move);
     }
+    console.log(result);
     return result;
 }
 
