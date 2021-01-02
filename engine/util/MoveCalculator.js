@@ -11,6 +11,23 @@ function moveIsNotFigurePosition(move, figurePosition) {
     return move.x !== figurePosition.x || move.y !== figurePosition.y;
 }
 
+function normalizeMoves(moves, side, figures) {
+    const result = [];
+    for (let i = 0; i < moves.length; i++) {
+        let isSelf = false;
+        const move = moves[i];
+        for (let j = 0; j < figures.length; j++) {
+            const { x, y } = figures[j].position;
+            if (x === move.x && y === move.y && figures[j].side === side) {
+                isSelf = true;
+                break;
+            }
+        }
+        !isSelf && result.push(move);
+    }
+    return result;
+}
+
 const hasBarier = (move, figures) => {
     for (let i = 0; i < figures.length; i++) {
         const figure = figures[i];
@@ -54,12 +71,12 @@ const calculateRook = calculate((x, y, moveCounter, side, figure, figures) => {
     //move to bottom
     for (let i = y - 1; i >= 0 && pushMove({x, y: i}); i--);
 
-    return calculatedMoves.filter(move => {
+    return normalizeMoves(calculatedMoves.filter(move => {
         return moveIsNotFigurePosition(move, { x, y });
-    });
+    }), side, figures);
 });
 
-const calculateKnight = calculate((x, y) => {
+const calculateKnight = calculate((x, y, moveCounter, side, figure, figures) => {
     const calculatedMoves = [];
     const moves = {
         m1 : { x: x - 1, y: y - 2 },
@@ -75,7 +92,7 @@ const calculateKnight = calculate((x, y) => {
         const m = moves[move];
         if (m.x >= 0 && m.x < 8 && m.y >= 0 && m.y < 8) calculatedMoves.push(m);
     }
-    return calculatedMoves;
+    return normalizeMoves(calculatedMoves, side, figures);
 });
 
 const calculateElephant = calculate((x, y, moveCounter, side, figure, figures) => {
@@ -95,7 +112,7 @@ const calculateElephant = calculate((x, y, moveCounter, side, figure, figures) =
     for (let i = x - 1, j = y + 1; (i >= 0 || j < 8) && pushMove({x: i, y: j}); i--, j++);
 
 
-    return calculatedMoves;
+    return normalizeMoves(calculatedMoves, side, figures);
 });
 
 const calculateQueen = calculate((x, y, counter, side, figure, figures) => {
@@ -105,14 +122,14 @@ const calculateQueen = calculate((x, y, counter, side, figure, figures) => {
     return calculatedMoves.concat(figure.calculateElephant(figures));
 });
 
-const calculateKing = calculate((x, y) => {
+const calculateKing = calculate((x, y, counter, side, figure, figures) => {
     const calculatedMoves = [];
     for (let i = x - 1; i < x + 2; i++) {
         if (y - 1 >= 0 && i >= 0 && i < 8) calculatedMoves.push({x: i, y: y - 1});
         if (i >= 0 && i < 8 && i !== x) calculatedMoves.push({x: i, y});
         if (y + 1 < 8 && i >= 0 && i < 8) calculatedMoves.push({x: i, y: y + 1});
     }
-    return calculatedMoves;
+    return normalizeMoves(calculatedMoves, side, figures);
 });
 
 const MoveCalculator = {
