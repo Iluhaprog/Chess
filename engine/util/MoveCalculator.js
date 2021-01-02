@@ -29,7 +29,6 @@ function normalizeMoves(moves, side, figures) {
         }
         !isSelf && result.push(move);
     }
-    console.log(result);
     return result;
 }
 
