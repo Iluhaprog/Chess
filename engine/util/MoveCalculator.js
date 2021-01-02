@@ -32,6 +32,32 @@ function normalizeMoves(moves, side, figures) {
     return result;
 }
 
+function normalizeMovesPawn(moves, figure, figures) {
+    let result = new Set();
+    for (const move of moves) {
+        for (const f of figures) {
+            const { x, y } = f.position;
+            if (move.x === x && move.y === y && f.side !== figure.side && move.x !== figure.position.x && move.isKill) {
+                result.add(move);
+            }
+            if (!move.isKill) {
+                result.add(move);
+            }
+        }
+    }
+    result = Array.from(result);
+    for (let i = 0; i < result.length; i++) {
+        const move = moves[i];
+        for (const f of figures) {
+            const { x, y } = f.position;
+            if (!move.isKill && x === move.x && y === move.y) {
+                result[i] = {};
+            }
+        }
+    }
+    return result;
+}
+
 const hasBarier = (move, figures) => {
     for (let i = 0; i < figures.length; i++) {
         const figure = figures[i];
@@ -45,17 +71,19 @@ const hasBarier = (move, figures) => {
 
 const calculatePawn = calculate((x, y, moveCounter, side, figure, figures) => {
     const calculatedMoves = [];
-    const pushMoves = factor => {
-       const move = {x, y: y + 1 * factor};
-        if (!hasBarier(move, figures)) {
-            calculatedMoves.push({x, y: y + 1 * factor});
-            if (!moveCounter) calculatedMoves.push({x, y: y + 2 * factor});
-        }
+    const pushMoves = (factorX, factorY, isKill = false) => {
+        const move = {x: x + 1 * factorX, y: y + 1 * factorY, isKill};
+        calculatedMoves.push(move);
+        if (!moveCounter) calculatedMoves.push({x, y: y + 2 * factorY});
     }
 
-    side === SIDE.BLACK && pushMoves(1);
-    side === SIDE.WHITE && pushMoves(-1);
-    return calculatedMoves;
+    side === SIDE.BLACK && pushMoves(0, 1);
+    side === SIDE.WHITE && pushMoves(0, -1);
+    side === SIDE.BLACK && pushMoves(-1, 1, true);
+    side === SIDE.BLACK && pushMoves(1, 1, true);
+    side === SIDE.WHITE && pushMoves(-1, -1, true);
+    side === SIDE.WHITE && pushMoves(1, -1, true);
+    return normalizeMovesPawn(calculatedMoves, figure, figures);
 });
 
 const calculateRook = calculate((x, y, moveCounter, side, figure, figures) => {
