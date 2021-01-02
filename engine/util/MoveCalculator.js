@@ -1,9 +1,9 @@
 import { SIDE } from '../config.js';
 
 function calculate(callback) {
-    return function calc() {
+    return function calc(figures) {
         const { x, y } = this.position;
-        return callback(x, y, this.moveCounter, this.side, this);
+        return callback(x, y, this.moveCounter, this.side, this, figures);
     }
 }
 
@@ -11,11 +11,25 @@ function moveIsNotFigurePosition(move, figurePosition) {
     return move.x !== figurePosition.x || move.y !== figurePosition.y;
 }
 
-const calculatePawn = calculate((x, y, moveCounter, side) => {
+const hasBarier = (move, figures) => {
+    for (let i = 0; i < figures.length; i++) {
+        const figure = figures[i];
+        const { x, y } = figure.position;
+        if (x === move.x && y === move.y) {
+            return true;
+        }
+    }
+    return false;
+}
+
+const calculatePawn = calculate((x, y, moveCounter, side, figure, figures) => {
     const calculatedMoves = [];
     const pushMoves = factor => {
-        calculatedMoves.push({x, y: y + 1 * factor});
-        if (!moveCounter) calculatedMoves.push({x, y: y + 2 * factor});
+       const move = {x, y: y + 1 * factor};
+        if (!hasBarier(move, figures)) {
+            calculatedMoves.push({x, y: y + 1 * factor});
+            if (!moveCounter) calculatedMoves.push({x, y: y + 2 * factor});
+        }
     }
 
     side === SIDE.BLACK && pushMoves(1);
@@ -23,12 +37,23 @@ const calculatePawn = calculate((x, y, moveCounter, side) => {
     return calculatedMoves;
 });
 
-const calculateRook = calculate((x, y) => {
+const calculateRook = calculate((x, y, moveCounter, side, figure, figures) => {
     const calculatedMoves = [];
-    for(let i = 0; i < 8; i++) {
-        calculatedMoves.push({ x: i, y });
-        calculatedMoves.push({ x, y: i });
+    const pushMove = move => {
+        calculatedMoves.push(move);
+        if (hasBarier(move, figures)) return false;
+        return true;
     }
+
+    //move to right
+    for (let i = x + 1; i < 8 && pushMove({x: i, y}); i++);
+    //move to left
+    for (let i = x - 1; i >= 0 && pushMove({x: i, y}); i--); 
+    //move to top
+    for (let i = y + 1; i < 8 && pushMove({x, y: i}); i++);
+    //move to bottom
+    for (let i = y - 1; i >= 0 && pushMove({x, y: i}); i--);
+
     return calculatedMoves.filter(move => {
         return moveIsNotFigurePosition(move, { x, y });
     });
@@ -53,30 +78,31 @@ const calculateKnight = calculate((x, y) => {
     return calculatedMoves;
 });
 
-const calculateElephant = calculate((x, y) => {
+const calculateElephant = calculate((x, y, moveCounter, side, figure, figures) => {
     const calculatedMoves = [];
-    let term = 1;
-    const pushMove = y => {
-        if (x + term < 8) calculatedMoves.push({ x: x + term, y });
-        if (x - term >= 0) calculatedMoves.push({ x: x - term, y });
-        term++;
+    const pushMove = move => {
+        calculatedMoves.push(move);
+        if (hasBarier(move, figures)) return false;
+        return true;
     }
-    const calc = (factor, condition)  => {
-        for (let i = y + 1 * factor; condition(i); i += 1 * factor) {
-            pushMove(i);
-        }
-    }
-    calc(-1, i => i >= 0);
-    term = 1;
-    calc(1, i => i < 8);
+    //move to top right
+    for (let i = x + 1, j = y - 1; (i < 8 || j >= 0) && pushMove({x: i, y: j}); i++, j--);
+    //move to top left
+    for (let i = x - 1, j = y - 1; (i >= 0 || j >= 0) && pushMove({x: i, y: j}); i--, j--);
+    //move to bottom right
+    for (let i = x + 1, j = y + 1; (i < 8 || j < 8) && pushMove({x: i, y: j}); i++, j++);
+    //move to bottom left
+    for (let i = x - 1, j = y + 1; (i >= 0 || j < 8) && pushMove({x: i, y: j}); i--, j++);
+
+
     return calculatedMoves;
 });
 
-const calculateQueen = calculate((x, y, counter, side, figure) => {
+const calculateQueen = calculate((x, y, counter, side, figure, figures) => {
     figure.calculateRook = calculateRook;
     figure.calculateElephant = calculateElephant;
-    const calculatedMoves = figure.calculateRook();
-    return calculatedMoves.concat(figure.calculateElephant());
+    const calculatedMoves = figure.calculateRook(figures);
+    return calculatedMoves.concat(figure.calculateElephant(figures));
 });
 
 const calculateKing = calculate((x, y) => {

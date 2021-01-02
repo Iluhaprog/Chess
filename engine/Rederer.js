@@ -10,6 +10,7 @@ class Renderer {
         this.h = h;
         this.cellSize = this.w / 8;
         this.board = board;
+        this.allFigures = this.board.whiteFigures.concat(this.board.blackFigures);
         this.selectedFigure = null;
     }
 
@@ -52,7 +53,7 @@ class Renderer {
     }
 
     findMoveByCoords(coords) {
-        const moves = this.selectedFigure.calculateMove();
+        const moves = this.selectedFigure.calculateMove(this.allFigures);
         for (let i = 0; i < moves.length; i++) {
             const moveIsMatch = this.match(moves[i], coords);
             if (moveIsMatch) return moves[i]; 
@@ -119,7 +120,7 @@ class Renderer {
     drawMoves(figure) {
         this.ctx.clearRect(0, 0, this.w, this.h);
         this.drawBoard();
-        const calculatedMoves = figure.calculateMove();
+        const calculatedMoves = figure.calculateMove(this.allFigures);
         for (let i = 0; i < calculatedMoves.length; i++) {
             const move = calculatedMoves[i];
             const x = move.x * this.cellSize;
