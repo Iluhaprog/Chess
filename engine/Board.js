@@ -5,8 +5,8 @@ class Board {
 	constructor() {
 		this.whiteFigures = [];
 		this.blackFigures = [];
+		this.allFigures = [];
 		this.moves = [];
-		this.initFigures();
 	}
 
 	addMove(move) {
@@ -23,6 +23,24 @@ class Board {
 			white: FigureGenerator[`gen${name}`](SIDE.WHITE, x, yW, index + name + SIDE.WHITE), 
 			black: FigureGenerator[`gen${name}`](SIDE.BLACK, x, yB, index + name + SIDE.BLACK),
 		});	
+	}
+
+	initFiguresByMoves(moves) {
+		this.initFigures();
+
+		this.moves = moves;
+		this.allFigures = this.whiteFigures.concat(this.blackFigures);
+		for (const move of moves) {
+			for(let i = 0; i < this.allFigures.length; i++) {
+				const figure = this.allFigures[i];
+				if (move.id == figure.id) {
+					this.allFigures[i].position = move;
+				}
+				if (move.id === figure.id && move.killed) {
+					this.allFigures = this.allFigures.slice(0, i).concat(this.allFigures.slice(i + 1));
+				}
+			}
+		}
 	}
 
 	initFigures() {
@@ -42,7 +60,6 @@ class Board {
 				this.genFigures('Queen', x, 0, 7, i);
 			}
 		}
-		console.log(this);
 	}
 }
 

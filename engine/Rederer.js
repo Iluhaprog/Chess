@@ -10,7 +10,7 @@ class Renderer {
         this.h = h;
         this.cellSize = this.w / 8;
         this.board = board;
-        this.allFigures = this.board.whiteFigures.concat(this.board.blackFigures);
+        this.allFigures = this.board.allFigures;
         this.selectedFigure = null;
     }
 
@@ -98,14 +98,19 @@ class Renderer {
             }
         }
         this.allFigures = this.allFigures.filter(f => f.id !== killedFigure.id);
+        const moveInfo = {...killMove, id: killedFigure.id, killed: true};
+        delete moveInfo.isKill;
+        this.board.addMove(moveInfo);
         this.drawBoard();
         this.drawFigures();
     }
 
     moveFigure(move) {
         const moveInfo = {...move, id: this.selectedFigure.id}
+        delete moveInfo.isKill;
         this.selectedFigure.position = move;
         this.board.addMove(moveInfo);
+        console.log(this.board.moves);
         this.drawBoard();
         this.drawFigures();
     }
