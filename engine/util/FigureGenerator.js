@@ -1,7 +1,8 @@
 import Figure from '../Figure.js';
 import { FIGURE } from '../config.js';
 
-const genFigure = figure => (side, x, y) => new Figure({
+const genFigure = figure => (side, x, y, id) => new Figure({
+    id: id,
     name: figure.name,
     side: side,
     position: { x, y },

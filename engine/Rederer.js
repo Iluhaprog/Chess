@@ -103,7 +103,9 @@ class Renderer {
     }
 
     moveFigure(move) {
+        const moveInfo = {...move, id: this.selectedFigure.id}
         this.selectedFigure.position = move;
+        this.board.addMove(moveInfo);
         this.drawBoard();
         this.drawFigures();
     }
