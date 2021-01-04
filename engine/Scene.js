@@ -1,4 +1,4 @@
-import { BLACK_COLOR, WHITE_COLOR, IMAGE, CALC_MOVE_COLOR, KILL_MOVE_COLOR } from './config.js';
+import { BLACK_COLOR, WHITE_COLOR, IMAGE, CALC_MOVE_COLOR, KILL_MOVE_COLOR, SIDE } from './config.js';
 
 class Scene {
     constructor(w, h, board) {
@@ -12,6 +12,8 @@ class Scene {
         this.board = board;
         this.allFigures = this.board.allFigures;
         this.selectedFigure = null;
+        this.toggler = true;
+        this.moveIs;
         this._actions = [];
     }
 
@@ -40,7 +42,8 @@ class Scene {
             const figure = this.allFigures[i];
             const pos = figure.position;
             const match = this.match(pos, coords);
-            if (match) {
+            this.moveIs = this.toggler ? SIDE.WHITE : SIDE.BLACK;
+            if (match && figure.side === this.moveIs) {
                 return figure;
             }
         }
@@ -92,6 +95,7 @@ class Scene {
             }
             if (selectedMove) {
                 this.moveFigure(selectedMove);
+                this.toggler = !this.toggler;
             }
             this.selectedFigure = null;
         }
