@@ -29,7 +29,6 @@ class Board {
 		this.initFigures();
 
 		this.moves = moves;
-		this.allFigures = this.whiteFigures.concat(this.blackFigures);
 		for (const move of moves) {
 			for(let i = 0; i < this.allFigures.length; i++) {
 				const figure = this.allFigures[i];
@@ -60,6 +59,7 @@ class Board {
 				this.genFigures('Queen', x, 0, 7, i);
 			}
 		}
+		this.allFigures = this.whiteFigures.concat(this.blackFigures);
 	}
 }
 
