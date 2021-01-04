@@ -1,6 +1,6 @@
 import { BLACK_COLOR, WHITE_COLOR, IMAGE, CALC_MOVE_COLOR, KILL_MOVE_COLOR } from './config.js';
 
-class Renderer {
+class Scene {
     constructor(w, h, board) {
         this.c = document.createElement('canvas');
         this.ctx = this.c.getContext('2d');
@@ -12,6 +12,7 @@ class Renderer {
         this.board = board;
         this.allFigures = this.board.allFigures;
         this.selectedFigure = null;
+        this._actions = [];
     }
 
     getCoordsByClick(event) {
@@ -65,6 +66,18 @@ class Renderer {
         }
         return null;
     }
+    
+    addAction(func) {
+        this._actions.push(func);
+    }
+
+    get actions() {
+        return this._actions;
+    }
+
+    runActions(move) {
+        this._actions.forEach(action => action(move));
+    }
 
     handleClick(e) {
         const coords = this.getCoordsByClick(e);
@@ -100,6 +113,7 @@ class Renderer {
         this.allFigures = this.allFigures.filter(f => f.id !== killedFigure.id);
         const moveInfo = {...killMove, id: killedFigure.id, killed: true};
         delete moveInfo.isKill;
+        this.runActions(moveInfo);
         this.board.addMove(moveInfo);
         this.drawBoard();
         this.drawFigures();
@@ -108,9 +122,9 @@ class Renderer {
     moveFigure(move) {
         const moveInfo = {...move, id: this.selectedFigure.id}
         delete moveInfo.isKill;
+        this.runActions(moveInfo);
         this.selectedFigure.position = move;
         this.board.addMove(moveInfo);
-        console.log(this.board.moves);
         this.drawBoard();
         this.drawFigures();
     }
@@ -174,4 +188,4 @@ class Renderer {
     }
 }
 
-export default Renderer;
+export default Scene;

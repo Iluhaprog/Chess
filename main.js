@@ -1,5 +1,5 @@
 import { Board } from "./engine/Board.js";
-import Renderer from "./engine/Rederer.js";
+import Scene from "./engine/Scene.js";
 
 const board = new Board();
 
@@ -24,9 +24,9 @@ const moves = [
 ];
 
 board.initFiguresByMoves(moves);
-console.log(board);
 
-const rederer = new Renderer(560, 560, board);
-rederer.init();
-rederer.drawBoard();
-rederer.drawFigures();
+const scene = new Scene(560, 560, board);
+scene.init();
+scene.addAction(move => console.log(move));
+scene.drawBoard();
+scene.drawFigures();
