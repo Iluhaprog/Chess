@@ -74,7 +74,7 @@ const calculatePawn = calculate((x, y, moveCounter, side, figure, figures) => {
     const pushMoves = (factorX, factorY, isKill = false) => {
         const move = {x: x + 1 * factorX, y: y + 1 * factorY, isKill};
         calculatedMoves.push(move);
-        if (!moveCounter) calculatedMoves.push({x, y: y + 2 * factorY});
+        if (!moveCounter && !hasBarier(move, figures) && !factorX) calculatedMoves.push({x, y: y + 2 * factorY});
     }
 
     side === SIDE.BLACK && pushMoves(0, 1);
