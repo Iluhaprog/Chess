@@ -7,6 +7,7 @@ class Figure {
 		this._side = side;
 		this._position = position;
 		this.calculateMove = calculateMoveMethod;
+		this.forbiddenMoves = [];
 		this.moveCounter = 0;
 	}
 

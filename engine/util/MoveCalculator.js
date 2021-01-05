@@ -11,7 +11,7 @@ function moveIsNotFigurePosition(move, figurePosition) {
     return move.x !== figurePosition.x || move.y !== figurePosition.y;
 }
 
-function normalizeMoves(moves, side, figures) {
+function normalizeMoves(moves = [], side, figures = []) {
     const result = [];
     for (let i = 0; i < moves.length; i++) {
         let isSelf = false;
@@ -32,7 +32,7 @@ function normalizeMoves(moves, side, figures) {
     return result;
 }
 
-function normalizeMovesPawn(moves, figure, figures) {
+function normalizeMovesPawn(moves = [], figure, figures = []) {
     let result = new Set();
     for (const move of moves) {
         for (const f of figures) {
@@ -45,7 +45,7 @@ function normalizeMovesPawn(moves, figure, figures) {
             }
         }
     }
-    result = Array.from(result);
+    result = Array.from(result || []);
     for (let i = 0; i < result.length; i++) {
         const move = moves[i];
         for (const f of figures) {
@@ -58,7 +58,7 @@ function normalizeMovesPawn(moves, figure, figures) {
     return result;
 }
 
-const hasBarier = (move, figures) => {
+const hasBarier = (move, figures = []) => {
     for (let i = 0; i < figures.length; i++) {
         const figure = figures[i];
         const { x, y } = figure.position;
@@ -69,7 +69,7 @@ const hasBarier = (move, figures) => {
     return false;
 }
 
-const calculatePawn = calculate((x, y, moveCounter, side, figure, figures) => {
+const shadowCalcPawn = (x, y, moveCounter, side, figures) => {
     const calculatedMoves = [];
     const pushMoves = (factorX, factorY, isKill = false) => {
         const move = {x: x + 1 * factorX, y: y + 1 * factorY, isKill};
@@ -83,6 +83,11 @@ const calculatePawn = calculate((x, y, moveCounter, side, figure, figures) => {
     side === SIDE.BLACK && pushMoves(1, 1, true);
     side === SIDE.WHITE && pushMoves(-1, -1, true);
     side === SIDE.WHITE && pushMoves(1, -1, true);
+    return calculatedMoves;
+};
+
+const calculatePawn = calculate((x, y, moveCounter, side, figure, figures) => {
+    const calculatedMoves = shadowCalcPawn(x, y, moveCounter, side, figures);
     return normalizeMovesPawn(calculatedMoves, figure, figures);
 });
 
@@ -156,10 +161,29 @@ const calculateQueen = calculate((x, y, counter, side, figure, figures) => {
 
 const calculateKing = calculate((x, y, counter, side, figure, figures) => {
     const calculatedMoves = [];
+    const forbiddenMoves = figure.forbiddenMoves;
+    const isNotForbidden = move => {
+        for (const forbiddenMove of forbiddenMoves) {
+            if (move.x === forbiddenMove.x && move.y === forbiddenMove.y) {
+                return false;
+            }
+        }
+        return true;
+    };
     for (let i = x - 1; i < x + 2; i++) {
-        if (y - 1 >= 0 && i >= 0 && i < 8) calculatedMoves.push({x: i, y: y - 1});
-        if (i >= 0 && i < 8 && i !== x) calculatedMoves.push({x: i, y});
-        if (y + 1 < 8 && i >= 0 && i < 8) calculatedMoves.push({x: i, y: y + 1});
+        let move;
+        if (y - 1 >= 0 && i >= 0 && i < 8) {
+            move = {x: i, y: y - 1};
+            isNotForbidden(move) && calculatedMoves.push(move);
+        }
+        if (i >= 0 && i < 8 && i !== x) {
+            move = {x: i, y};
+            isNotForbidden(move) && calculatedMoves.push(move);
+        }
+        if (y + 1 < 8 && i >= 0 && i < 8) {
+            move = {x: i, y: y + 1};
+            isNotForbidden(move) && calculatedMoves.push(move);
+        }
     }
     return normalizeMoves(calculatedMoves, side, figures);
 });
@@ -171,6 +195,7 @@ const MoveCalculator = {
     calculateElephant,
     calculateQueen,
     calculateKing,
+    shadowCalcPawn,
 };
 
 export default MoveCalculator;

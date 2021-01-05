@@ -1,4 +1,5 @@
 import { BLACK_COLOR, WHITE_COLOR, IMAGE, CALC_MOVE_COLOR, KILL_MOVE_COLOR, SIDE } from './config.js';
+import { checkKing, getForbiddenMoves, getShahMove } from '../engine/util/KingAnalizator.js';
 
 class Scene {
     constructor(w, h, board) {
@@ -37,13 +38,30 @@ class Scene {
         return matchByX && matchByY;
     }
 
+    getKing() {
+        for (const figure of this.allFigures) {
+            if (figure.name === 'king' && figure.side === this.moveIs) {
+                const shahMoves = getShahMove(figure, this.allFigures);
+                const forbiddenMoves = getForbiddenMoves(figure, this.allFigures);
+                figure.forbiddenMoves.push(...shahMoves);
+                figure.forbiddenMoves.push(...forbiddenMoves);
+                return figure;
+            }
+        }
+    }
+
     findFigureByCoords(coords) {
         for(let i = 0; i < this.allFigures.length; i++) {
             const figure = this.allFigures[i];
             const pos = figure.position;
             const match = this.match(pos, coords);
             this.moveIs = this.toggler ? SIDE.WHITE : SIDE.BLACK;
-            if (match && figure.side === this.moveIs) {
+            const king = this.getKing();
+            const { shah } = checkKing(king);
+            if (match && figure.side === this.moveIs && !shah) {
+                return figure;
+            }
+            if (shah && figure.name === 'king' && match && figure.side === this.moveIs) { 
                 return figure;
             }
         }
